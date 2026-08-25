@@ -3156,6 +3156,8 @@ function clearUnityCache() {
         console.log("[Preloader] All Unity caches cleared.");
     });
 }
+window.clearUnityCache = clearUnityCache
+
 function fallbackInterceptFetch() {
     return __awaiter(this, void 0, void 0, function* () {
         logger.debug("Installing fetch interceptor for Unity web data");
