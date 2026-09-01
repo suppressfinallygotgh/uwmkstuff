@@ -8,6 +8,6 @@
     "pingtextmethod": "11lIӀӀ",
     "crosshairinstance": "lΙlӀӀΙ",
     "cameracontroller": "1IΙIlӀ",
-    "killfeedbytes": [0xF3,0x04,0x65,0x02,0xF5,0x07]
+    "killfeedbytes": [243, 4, 101, 2, 245, 7]
   }
 }
