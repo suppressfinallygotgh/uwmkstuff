@@ -8,6 +8,12 @@
     "pingtextmethod": "11lIӀӀ",
     "crosshairinstance": "lΙlӀӀΙ",
     "cameracontroller": "1IΙIlӀ",
-    "killfeedbytes": [243, 4, 101, 2, 245, 7]
+    "killfeedbytes": [243, 4, 101, 2, 245, 7],
+    "mainmenuinstance": "lΙ1IıӀ",
+    "eliminatedkillfeedshowmethod": "ӀΙΙ1ı",
+    "nicknameWidgetsclass": "ΙIıΙ",
+    "nicknameWidgetsinstance": "1IllΙl",
+    "playerlobbyplayerid": "1I1ıΙI",
+    "playerwidgetplayerid": "1Illıı"
   }
 }
