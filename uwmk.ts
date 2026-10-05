@@ -5099,17 +5099,59 @@ function applyStructInit(runtime, struct, init) {
 // already the right length, so a call's out-buffer is copied exactly once.
 function createStructValue(runtime, typeName, source) {
     const size = runtime.sizeOfStruct(typeName);
+
     let bytes;
-    if (source instanceof Uint8Array)
-        bytes = source.length === size || !size ? source : source.slice(0, size);
-    else
+
+    if (source instanceof Uint8Array) {
+        bytes = source.length === size || !size
+            ? source.slice()
+            : source.slice(0, size);
+    } else {
         bytes = new Uint8Array(size || 0);
-    const ptr = runtime.malloc(size || 1)
-    const struct = createStructProxy(runtime, new ValueWrapper(ptr), typeName, true);
-    if (source && !(source instanceof Uint8Array) && typeof source === "object")
+    }
+
+    const store = {
+        detached: true,
+        bytes,
+        view: () => new DataView(
+            bytes.buffer,
+            bytes.byteOffset,
+            bytes.byteLength
+        ),
+        base: () => 0,
+        nested: (offset) => {
+            const nestedBytes = bytes.subarray(offset);
+            return {
+                detached: true,
+                bytes: nestedBytes,
+                view: () => new DataView(
+                    nestedBytes.buffer,
+                    nestedBytes.byteOffset,
+                    nestedBytes.byteLength
+                ),
+                base: () => 0,
+                nested: (nestedOffset) => {
+                    return store.nested(offset + nestedOffset);
+                },
+            };
+        },
+    };
+    const struct = createStructProxy(
+        runtime,
+        store,
+        typeName,
+        false
+    );
+    if (
+        source &&
+        !(source instanceof Uint8Array) &&
+        typeof source === "object"
+    ) {
         applyStructInit(runtime, struct, source);
+    }
     return struct;
 }
+
 // Gives a struct an address in the arena for the length of one call. A handle
 // already in the heap keeps the address it has; a detached copy is written into
 // scratch space. Returns 0 if there is nowhere to put it.
@@ -8110,7 +8152,8 @@ class Runtime {
                     absorbStruct(this, handle, at);
             // Copied out before the arena unwinds: the value the caller keeps is
             // a copy, which is exactly what a by-value return is.
-            return createStructValue(this, sret.type, this.memory(out, size));
+            const returned = this.memory(out, size);
+            return createStructValue(this, sret.type, returned);
         }
         catch (err) {
             // Emscripten surfaces a C++/managed exception as a bare pointer, so
